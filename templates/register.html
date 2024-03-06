@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="/static/css/style.css">
+{% endblock %}
+
+{% block navbar %}
+<a href="#">MyApp</a>
+<div>
+    <a href="/login">Login</a>
+    <a href="#">Register</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<h2>Register</h2>
+<form>
+<div class="form-group">
+    <label for="email">Email address</label>
+    <input type="email" id="email">
+</div>
+<div class="form-group">
+    <label for="password">Password</label>
+    <input type="password" id="password">
+</div>
+<div class="form-group">
+    <label for="confirmPassword">Confirm Password</label>
+    <input type="password" id="confirmPassword">
+</div>
+<button type="submit">Register</button>
+</form>
+{% endblock %}

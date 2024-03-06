@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+{% endblock %}
+
+{% block navbar %}
+<a href="#">MyApp</a>
+<div>
+    <span>User: {{ username }}</span>
+    <a href="/login">Logout</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Dashboard - Poslední naměřené hodnoty</h2>
+    <div class="my-3">
+        <h4>Poslední hodnota</h4>
+        <p>Čas: {{ measurements[-1].timestamp }}, Teplota: {{ measurements[-1].temp }}°C</p>
+    </div>
+    <div class="my-3">
+        <h4>Smazat Y posledních hodnot: </h4>
+        <form action="/delete-last-values" method="post">
+            <div class="form-group">
+                <label for="numValues">Počet hodnot k smazání:</label>
+                <input type="number" class="form-control" id="numValues" name="numValues" min="1" required>
+            </div>
+            <input type="submit" class="btn btn-danger" value="Smazat">
+        </form>
+    </div>
+    <div class="my-3">
+        <h4>Tabulka posledních hodnot</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Čas</th>
+                    <th>Teplota</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for measurement in measurements %}
+                <tr>
+                    <td>{{ measurement.timestamp }}</td>
+                    <td>{{ measurement.temp }}°C</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
