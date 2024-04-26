@@ -2,33 +2,45 @@
 
 {% block title %}Register{% endblock %}
 
-{% block style %}
-<link rel="stylesheet" href="/static/css/style.css">
-{% endblock %}
-
 {% block navbar %}
-<a href="#">MyApp</a>
-<div>
-    <a href="/login">Login</a>
-    <a href="#">Register</a>
+<div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+        </li>
+    </ul>
 </div>
 {% endblock %}
 
 {% block content %}
-<h2>Register</h2>
-<form>
-<div class="form-group">
-    <label for="email">Email address</label>
-    <input type="email" id="email">
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col col-sm-6 col-md-4 col-lg-6">
+            <h2>Register</h2>
+            <form action="/register" method="POST">
+                <div class="form-group">
+                    <label for="firstname">First name</label>
+                    <input class="form-control" type="text" id="firstname" name="firstname" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastname">Last name</label>
+                    <input class="form-control" type="text" id="lastname" name="lastname" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input class="form-control" type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input class="form-control" type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+                <button class="btn btn-primary" type="submit">Register</button>
+            </form>
+        </div>
+    </div>
 </div>
-<div class="form-group">
-    <label for="password">Password</label>
-    <input type="password" id="password">
-</div>
-<div class="form-group">
-    <label for="confirmPassword">Confirm Password</label>
-    <input type="password" id="confirmPassword">
-</div>
-<button type="submit">Register</button>
-</form>
 {% endblock %}
+{% block scripts %}{% endblock %}

@@ -4,16 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
-    {% block style %}{% endblock %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-<div class = "navbar">
-    {% block navbar %}{% endblock %}
-</div>
-
-<div class="container">
-    {% block content %}{% endblock %}
-</div>
-
+    <!-- Navbar -->
+    <div class = "navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Measurements</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            {% block navbar %}{% endblock %}
+        </div>
+    </div>
+    <!-- Content -->
+        {% block content %}{% endblock %}
 </body>
+    {% block scripts %}{% endblock %}
 </html>

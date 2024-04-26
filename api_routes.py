@@ -1,4 +1,4 @@
-from flask import request, jsonify, abort, render_template
+from flask import request, jsonify, abort, render_template, redirect
 from datetime import datetime
 import logging
 from config import measurements
@@ -55,19 +55,44 @@ def init_api(app):
         return jsonify({"message": f"Deleted oldest {num} measurements"}), 200
 
     #show login page
-    @app.route('/login')
+    @app.route('/login', methods=['POST', 'GET'])
     def login():
-        return render_template("login.html")
+        if request.method == 'GET':
+            return render_template("login.html")
+        elif request.method == 'POST':
+            email = request.form.get('email')
+            password = request.form.get('password')
+            #TO-DO Validation
+            # session['email'] = email
+            return redirect('/dashboard')
+    
+    @app.route('/logout')
+    def logout():
+        # session.clear()
+        return redirect('/login')
 
     #show register page
-    @app.route('/register')
+    @app.route('/register', methods=['POST', 'GET'])
     def register():
-        return render_template("register.html")
+        if request.method == 'GET':
+            return render_template("register.html")
+        elif request.method == 'POST':
+            first_name = request.form.get('firstname')
+            last_name = request.form.get('lastname')
+            email = request.form.get('email')
+            password = request.form.get('password')
+            confirm_password = request.form.get('confirmPassword')
+            #TO-DO: validation
+            return redirect('/login')
 
     #show dashboard
     @app.route('/dashboard')
     def dashboard():
-        from config import measurements
-        username = "aivazart@fel.cvut.cz"
-        return render_template("dashboard.html", username=username, measurements=measurements)
+        # if 'email' in session.keys():
+            from config import measurements
+            username = "aivazart@fel.cvut.cz"
+            return render_template("dashboard.html", username=username, measurements=measurements)
+        # else: 
+        #     #to-do: no seesion found
+        #     return render_template("dashboard.html", username=username, measurements=measurements)
 
