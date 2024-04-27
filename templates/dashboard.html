@@ -3,7 +3,7 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block navbar %}
-<form action="/logout" method="GET">
+<form action="/api/logout" method="GET">
     <span class="navbar-text">{{ username }}</span>
     <button class="btn btn-outline-danger" type="submit">Logout</button>
 </form>
@@ -14,22 +14,22 @@
     <div class="row justify-content-center">
         <div class="col-md-10">
             <h2>Dashboard - Poslední naměřené hodnoty</h2>
+            <div class="my-3" id="last-measurement"></div>
             <div class="my-3">
-                <h4>Poslední hodnota</h4>
-                <p>Čas: {{ measurements[-1].timestamp }}, Teplota: {{ measurements[-1].temp }}°C</p>
+                <h4>Smazat Y nejstarsich hodnot: </h4>
+                <div class="form-group">
+                    <label for="num">Počet hodnot k smazání:</label>
+                    <input type="number" class="form-control" id="num" name="num" min="1" required>
+                </div>
+                <button class="btn btn-danger" onclick="delete_old_measurements()">Smazat</button>
             </div>
             <div class="my-3">
-                <h4>Smazat Y posledních hodnot: </h4>
-                <form action="/delete-last-values" method="post">
-                    <div class="form-group">
-                        <label for="numValues">Počet hodnot k smazání:</label>
-                        <input type="number" class="form-control" id="numValues" name="numValues" min="1" required>
-                    </div>
-                    <input type="submit" class="btn btn-danger" value="Smazat">
-                </form>
-            </div>
-            <div class="my-3">
-                <h4>Tabulka posledních hodnot</h4>
+                <h4>Zobrazit X posledních hodnot: </h4>
+                <div class="form-group">
+                    <label for="num_measurements">Počet hodnot k zobrazeni:</label>
+                    <input type="number" class="form-control" id="num_measurements" name="num_measurements" min="1" required>
+                    <button class="btn btn-primary mt-2" type="button" onclick="fetchMeasurements()">Zobrazit</button>
+                </div>
                 <table class="table">
                     <thead>
                         <tr>
@@ -40,8 +40,8 @@
                     <tbody>
                         {% for measurement in measurements %}
                         <tr>
-                            <td>{{ measurement.timestamp }}</td>
-                            <td>{{ measurement.temp }}°C</td>
+                            <td>{{ measurement.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>{{ measurement.temperature }}°C</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -51,4 +51,82 @@
     </div>    
 </div>
 {% endblock %}
-{% block scripts %}{% endblock %}
+{% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchLastMeasurement();
+        });
+
+        function fetchLastMeasurement() {
+            fetch('/api/measurements/last', {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('No measurements available');
+                } else {
+                    updateLastMeasurement(data);
+                }
+            })
+            .catch(error => console.error('Error fetching the last measurement:', error));
+        }
+
+        function updateLastMeasurement(measurement) {
+            const measurementDiv = document.querySelector("#last-measurement");
+            measurementDiv.innerHTML = `<h4>Poslední hodnota</h4>
+                                        <p>Čas: ${measurement.timestamp}, Teplota: ${measurement.temp}°C</p>`;
+        }
+
+        function delete_old_measurements() {
+            const num = document.getElementById('num').value;
+            if (num) {
+                fetch(`/api/measurements/delete_oldest/${num}`, {
+                method: 'DELETE'
+            }).then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    console.error('Failed to delete oldest' +  num + ' measurements');
+                }
+            })
+                .catch(error => {
+                    console.error('Error during fetching: ' + error);
+                });
+            } else {
+                alert('Please enter a number of measurements to delete.');
+            }
+        }
+        function fetchMeasurements() {
+            const num = document.getElementById('num_measurements').value;
+            if (num > 0) {
+                fetch(`/api/measurements/last/${num}`, {
+                    method: 'GET'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        updateTable(data);
+                    }
+                })
+                .catch(error => console.error('Error fetching measurements:', error));
+            } else {
+                alert("Please enter a positive number");
+            }
+        }
+
+        function updateTable(measurements) {
+            const table = document.querySelector(".table tbody");
+            table.innerHTML = '';
+            measurements.forEach(measurement => {
+                const row = `<tr>
+                                <td>${measurement.timestamp}</td>
+                                <td>${measurement.temp}°C</td>
+                             </tr>`;
+                table.innerHTML += row;
+            });
+        }
+    </script>
+{% endblock %}
