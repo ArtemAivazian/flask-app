@@ -28,24 +28,26 @@ csv_filename = 'data.csv'
 def save_to_csv(data):
     with open(csv_filename, 'a') as f:  # Open the file in append mode
         f.write(data + '\n')  # Write the message and a newline character
-
+        
 def read_from_uart():
-    if uart.any():
-        return uart.readline().decode().strip()  # Read line from UART and strip newline
+    list = uselect.select([sys.stdin], [], [], 0.01)
+    if list[0]:
+        line = uart.readline()
+        if line:
+            return line.decode().strip()  # Read line from UART and strip newline
     return None
 
 while True:
     data = read_from_uart()
     if data:
-        if data.startswith('interval='):
-            try:
-                sleep_interval = int(data.split('=')[1])
-                print(f"Interval updated to {sleep_interval} seconds")
-                save_to_csv(data) 
-            except ValueError:
-                print("Invalid interval received")
+        try:
+            sleep_interval = int(data.split('=')[1])
+            print(f"Interval updated to {sleep_interval} seconds")
+            save_to_csv(data)  # Save received command to CSV only if it's an interval update
+        except ValueError:
+            print("Invalid interval received")
 
     temperature = random.uniform(-20.0, 40.0)
-    print(temperature)
+    print(temperature)  # Print temperature to serial for debugging
 
     time.sleep(sleep_interval)
