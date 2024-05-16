@@ -1,17 +1,21 @@
-import threading
-import serial
-import requests
 from app import create_app
-from datetime import datetime
+import threading
+import requests
+import serial
 
 flask_app = create_app()
 
+# Define the parameters for the serial connection
+port = '/dev/tty.usbmodem1101'
+baudrate = 115200
+serial_connection = serial.Serial(port, baudrate)
+stop_event = threading.Event()
 
-def read_from_serial(port, baudrate, stop_event):
+
+def read_from_serial(ser, stop_event):
     try:
-        serial_connection = serial.Serial(port, baudrate)
         while not stop_event.is_set():
-            data = serial_connection.readline().decode().strip()
+            data = ser.readline().decode().strip()
             if data:
                 try:
                     # Prepare data for POST request
@@ -28,17 +32,11 @@ def read_from_serial(port, baudrate, stop_event):
     except serial.serialutil.SerialException as e:
         print(f"Error opening serial port: {e}")
     finally:
-        serial_connection.close()
-
-
-# Define the parameters for the serial connection
-port = '/dev/tty.usbmodem1101'
-baudrate = 115200
-stop_event = threading.Event()
+        ser.close()
 
 
 def start_serial_reader():
-    serial_thread = threading.Thread(target=read_from_serial, args=(port, baudrate, stop_event))
+    serial_thread = threading.Thread(target=read_from_serial, args=(serial_connection, stop_event))
     serial_thread.daemon = True
     serial_thread.start()
     return serial_thread

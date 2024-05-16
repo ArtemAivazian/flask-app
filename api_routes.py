@@ -1,16 +1,35 @@
 import logging
+import serial
 from datetime import datetime
 
 from flask import request, jsonify, abort, render_template, redirect
 
 from models import User, Measurements
 
+from utils import update_setting
+
+
 logging.basicConfig(level=logging.INFO)
 
 
 # Funkce API:
 def register_routes(app, db, bcrypt):
+    @app.route('/api/settings/sending-period', methods=['POST'])
+    def update_sending_period():
+        data = request.json
+        if 'sending_period' not in data:
+            abort(400, description="Missing 'sending_period' in request body.")
 
+        sending_period = data['sending_period']
+
+        port = '/dev/tty.usbmodem1101'
+        baudrate = 115200
+        serial_connection = serial.Serial(port, baudrate)
+        # Assuming you have a function or method to update settings
+        update_setting('sending_period', sending_period, serial_connection)  # Update the setting
+
+        logging.info(f'Sending period updated to: {sending_period} seconds')
+        return jsonify({"message": "Sending period updated successfully"}), 200
 
     #Vložení hodnoty {“timestamp”: value, “temp”: value} pomocí vhodně zvolené metody.
     @app.route('/api/measurements', methods=['POST'])

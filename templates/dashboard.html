@@ -23,6 +23,16 @@
                 </div>
                 <button class="btn btn-danger" onclick="delete_old_measurements()">Smazat</button>
             </div>
+
+            <div class="my-3">
+                <h4>Update Data Sending Period:</h4>
+                <div class="form-group">
+                    <label for="sending_period">Sending Period (seconds):</label>
+                    <input type="number" class="form-control" id="sending_period" name="sending_period" min="1" required>
+                    <button class="btn btn-primary mt-2" type="button" onclick="updateSendingPeriod()">Update Period</button>
+                </div>
+            </div>
+
             <div class="my-3">
                 <h4>Zobrazit X posledních hodnot: </h4>
                 <div class="form-group">
@@ -128,5 +138,24 @@
                 table.innerHTML += row;
             });
         }
+        function updateSendingPeriod() {
+            const period = document.getElementById('sending_period').value;
+            fetch('/api/settings/sending-period', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({sending_period: period})
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("Sending period updated successfully!");
+                } else {
+                    response.json().then(data => alert("Error: " + data.description));
+                }
+            })
+            .catch(error => console.error('Error updating sending period:', error));
+        }
+
     </script>
 {% endblock %}

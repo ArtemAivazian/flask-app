@@ -16,6 +16,7 @@ def create_app():
     bcrypt = Bcrypt()
 
     from api_routes import register_routes
+
     register_routes(app, db, bcrypt)
 
     migrate = Migrate(app, db)
